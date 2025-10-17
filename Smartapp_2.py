@@ -1,23 +1,40 @@
-def aantal_dagen():
-    f = open("input.txt", "r")
-    regels = f.readlines()
-    f.close()
-    dagen = len(regels) - 1
-    print("Aantal dagen in het bestand is:", dagen)
+def aantal_dagen(bestand):
+    try:
+        f = open(bestand, "r")
+        regels = f.readlines()
+        f.close()
+        return len(regels) - 1
+    except:
+        print("Bestand niet gevonden.")
+        return 0
 
-def auto_bereken():
-    f = open("input.txt", "r")
-    regels = f.readlines()
-    f.close()
+
+def auto_bereken(input_bestand, output_bestand):
+    try:
+        f = open(input_bestand, "r")
+        regels = f.readlines()
+        f.close()
+    except:
+        print("Inputbestand niet gevonden.")
+        return
+
     resultaten = []
 
     for regel in regels[1:]:
-        # elke regel heeft: datum, mensen, setpoint, buiten, regen
-        datum, mensen, setpoint, buiten, regen = regel.split()
-        mensen = int(mensen)
-        setpoint = float(setpoint)
-        buiten = float(buiten)
-        regen = float(regen)
+        data = regel.split()
+        if len(data) < 5:
+            print("Onvolledige regel, gestopt.")
+            return
+
+        datum, personen, setpoint, buiten, regen = data
+        try:
+            personen = int(personen)
+            setpoint = float(setpoint)
+            buiten = float(buiten)
+            regen = float(regen)
+        except:
+            print("Fout in data, programma gestopt.")
+            return
 
         verschil = setpoint - buiten
         if verschil >= 20:
@@ -27,7 +44,7 @@ def auto_bereken():
         else:
             cv = 0
 
-        ventilatie = mensen + 1
+        ventilatie = personen + 1
         if ventilatie > 4:
             ventilatie = 4
 
@@ -36,73 +53,107 @@ def auto_bereken():
         else:
             bewatering = False
 
-        resultaten.append(f"{datum};{cv};{ventilatie};{bewatering}")
+        resultaten.append(datum + ";" + str(cv) + ";" + str(ventilatie) + ";" + str(bewatering))
 
-    f = open("output.txt", "w")
-    for r in resultaten:
-        f.write(r + "\n")
-    f.close()
+    try:
+        f = open(output_bestand, "w")
+        for regel in resultaten:
+            f.write(regel + "\n")
+        f.close()
+        print("Berekening opgeslagen in", output_bestand)
+    except:
+        print("Kon niet schrijven naar bestand.")
 
-    print("De berekeningen zijn gedaan en opgeslagen in output.txt!")
 
+def waarde_aanpassen(output_bestand):
+    try:
+        f = open(output_bestand, "r")
+        regels = f.readlines()
+        f.close()
+    except:
+        print("Outputbestand niet gevonden. Gebruik eerst optie 2.")
+        return
 
-def waarde_aanpassen():
-    f = open("output.txt", "r")
-    regels = f.readlines()
-    f.close()
-
-    datum = input("Welke datum wil je veranderen? ")
+    datum = input("Datum die je wil aanpassen: ")
+    gevonden = False
 
     for i in range(len(regels)):
         if regels[i].startswith(datum):
+            gevonden = True
             onderdelen = regels[i].strip().split(";")
             print("1 = CV ketel, 2 = Ventilatie, 3 = Bewatering")
-            keuze = input("Wat wil je aanpassen? ")
+            keuze = input("Wat wil je aanpassen (1-3): ")
 
             if keuze == "1":
-                nieuw = input("Nieuwe waarde voor CV ketel: ")
-                onderdelen[1] = nieuw
+                nieuw = input("Nieuwe waarde CV ketel (0-100): ")
+                if nieuw.isdigit() and 0 <= int(nieuw) <= 100:
+                    onderdelen[1] = nieuw
+                else:
+                    print("Ongeldige waarde.")
+                    return
+
             elif keuze == "2":
-                nieuw = input("Nieuwe waarde voor ventilatie: ")
-                onderdelen[2] = nieuw
+                nieuw = input("Nieuwe waarde ventilatie (0-4): ")
+                if nieuw.isdigit() and 0 <= int(nieuw) <= 4:
+                    onderdelen[2] = nieuw
+                else:
+                    print("Ongeldige waarde.")
+                    return
+
             elif keuze == "3":
-                nieuw = input("Nieuwe waarde voor bewatering (True/False): ")
-                onderdelen[3] = nieuw
+                nieuw = input("Nieuwe waarde bewatering (True/False): ").capitalize()
+                if nieuw in ["True", "False"]:
+                    onderdelen[3] = nieuw
+                else:
+                    print("Ongeldige waarde.")
+                    return
+            else:
+                print("Verkeerde keuze.")
+                return
 
             regels[i] = ";".join(onderdelen) + "\n"
             break
 
-    f = open("output.txt", "w")
-    for r in regels:
-        f.write(r)
-    f.close()
+    if not gevonden:
+        print("Datum niet gevonden.")
+        return
 
-    print("De waarde is aangepast!")
+    try:
+        f = open(output_bestand, "w")
+        for r in regels:
+            f.write(r)
+        f.close()
+        print("Waarde aangepast.")
+    except:
+        print("Fout bij opslaan.")
 
 
 def smart_app():
+    input_bestand = "input.txt"
+    output_bestand = "output.txt"
+
     while True:
         print("\n--- Smart App Controller ---")
         print("1. Aantal dagen weergeven")
-        print("2. Berekenen en opslaan")
+        print("2. Automatisch berekenen")
         print("3. Waarde aanpassen")
         print("4. Stoppen")
 
         keuze = input("Kies een optie: ")
 
         if keuze == "1":
-            aantal_dagen()
+            dagen = aantal_dagen(input_bestand)
+            print("Aantal dagen in bestand:", dagen)
         elif keuze == "2":
-            auto_bereken()
+            auto_bereken(input_bestand, output_bestand)
         elif keuze == "3":
-            waarde_aanpassen()
+            waarde_aanpassen(output_bestand)
         elif keuze == "4":
             print("Programma gestopt.")
             break
         else:
-            print("Verkeerde keuze, probeer opnieuw.")
+            print("Ongeldige keuze.")
 
 
 if __name__ == "__main__":
     smart_app()
-
