@@ -11,7 +11,7 @@ def weerrapport(temp_celcius, windsnelheid, luchtvochtigheid):
     elif x < 0 and windsnelheid <= 10:
         return "Het is behoorlijk koud! Verwarming aan op de benedenverdieping!"
     elif 0 <= x < 10 and windsnelheid > 12:
-        return "Het is best koud en het waait, verwarming aan en roosters dicht!"
+        return "Het is best koud en het waait; verwarming aan en roosters dicht!"
     elif 0 <= x < 10 and windsnelheid <= 12:
         return "Het is een beetje koud, elektrische kachel op de benedenverdieping aan!"
     elif 10 <= x < 22:
@@ -21,21 +21,23 @@ def weerrapport(temp_celcius, windsnelheid, luchtvochtigheid):
 
 def weerstation():
     temperaturen = []
+
     for dag in range(1, 8):
-        t = input(f"Wat is op dag {dag} de temperatuur [C]: ")
+        t = input(f"Wat is op dag {dag} de temperatuur[C]: ")
         if t == "":
             print("bye")
-            break
+            return
+
         temp_celcius = float(t)
-        windsnelheid = float(input(f"Wat is op dag {dag} de windsnelheid [m/s]: "))
-        luchtvochtigheid = int(input(f"Wat is op dag {dag} de vochtigheid [%]: "))
+        windsnelheid = float(input(f"Wat is op dag {dag} de windsnelheid[m/s]: "))
+        luchtvochtigheid = float(input(f"Wat is op dag {dag} de vochtigheid[%]: "))
 
         temperaturen.append(temp_celcius)
 
         print(f"Het is {temp_celcius}C ({round(Fahrenheit(temp_celcius), 1)}F)")
         print(weerrapport(temp_celcius, windsnelheid, luchtvochtigheid))
-        print("Gem. temp tot nu toe is", round(sum(temperaturen)/len(temperaturen), 1))
-        print("="*40)
+        print(f"Gem. temp tot nu toe is {round(sum(temperaturen)/len(temperaturen), 1)}")
+        print("========================================")
 
 if __name__ == "__main__":
     weerstation()
