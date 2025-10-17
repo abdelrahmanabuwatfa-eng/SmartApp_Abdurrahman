@@ -10,7 +10,7 @@ def weer_api():
             params={"latitude": 52.09, "longitude": 5.12, "current_weather": True}
         )
         temp = response.json()["current_weather"]["temperature"]
-        print(f"\n🌤️  De temperatuur in Utrecht is {temp}°C\n")
+        print(f"\n De temperatuur in Utrecht is {temp}°C\n")
     except:
         print(" Fout: kan temperatuur niet ophalen.\n")
 
@@ -33,10 +33,12 @@ def hoofdmenu():
         elif keuze == "3":
             weer_api()
         elif keuze == "4":
-            print("👋 Programma gestopt. Tot de volgende keer!")
+            print("Programma gestopt. Tot de volgende keer!")
             break
         else:
-            print("❌ Ongeldige keuze, probeer opnieuw.\n")
+            print("Ongeldige keuze, probeer opnieuw.\n")
 
 if __name__ == "__main__":
     hoofdmenu()
+
+
