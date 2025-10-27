@@ -1,0 +1,115 @@
+from Smartapp_1 import weerstation
+from Smartapp_2 import smart_app
+from Smartapp_3 import weer_api
+
+class CO2Calculator:
+    def run(self):
+        print("\n--- CO2 Calculator ---")
+        try:
+            km = float(input("Hoeveel km met de auto per maand? "))
+            kwh = float(input("Hoeveel kWh stroom gebruik je per maand? "))
+            dieet = int(input("Wat voor dieet heb je (1=vleesrijk, 2=gemiddeld, 3=vegetarisch, 4=vegan)? "))
+
+            auto = km * 0.18
+            stroom = kwh * 0.40
+            dieet_co2 = {1:200, 2:150, 3:110, 4:90}.get(dieet, 150)
+            totaal = auto + stroom + dieet_co2
+
+            print(f"\nJe totale uitstoot is ongeveer {totaal:.1f} kg CO2 per maand.\n")
+        except:
+            print("Ongeldige invoer, probeer opnieuw.\n")
+
+class TodoApp:
+    def __init__(self):
+        self.bestand = "todo.txt"
+
+    def run(self):
+        while True:
+            print("\n--- TO-DO ---")
+            print("1. Lijst tonen")
+            print("2. Taak toevoegen")
+            print("3. Taak verwijderen")
+            print("4. Stoppen")
+            keuze = input("Keuze: ")
+            if keuze == "1":
+                self.lijst_tonen()
+            elif keuze == "2":
+                self.toevoegen()
+            elif keuze == "3":
+                self.verwijderen()
+            elif keuze == "4":
+                break
+            else:
+                print("Ongeldige keuze.\n")
+
+    def lijst_tonen(self):
+        try:
+            with open(self.bestand, "r", encoding="utf-8") as f:
+                taken = [t.strip() for t in f.readlines()]
+            if not taken:
+                print("Geen taken gevonden.")
+            else:
+                for i, taak in enumerate(taken, 1):
+                    print(f"{i}. {taak}")
+        except FileNotFoundError:
+            print("Nog geen taken toegevoegd.")
+
+    def toevoegen(self):
+        taak = input("Nieuwe taak: ").strip()
+        if taak:
+            with open(self.bestand, "a", encoding="utf-8") as f:
+                f.write(taak + "\n")
+            print("Taak toegevoegd!")
+        else:
+            print("Lege taak niet toegevoegd.")
+
+    def verwijderen(self):
+        try:
+            with open(self.bestand, "r", encoding="utf-8") as f:
+                taken = [t.strip() for t in f.readlines()]
+            if not taken:
+                print("Geen taken om te verwijderen.")
+                return
+            self.lijst_tonen()
+            nummer = int(input("Nummer taak om te verwijderen: "))
+            if 1 <= nummer <= len(taken):
+                verwijderd = taken.pop(nummer - 1)
+                with open(self.bestand, "w", encoding="utf-8") as f:
+                    for t in taken:
+                        f.write(t + "\n")
+                print(f"Taak '{verwijderd}' verwijderd.")
+            else:
+                print("Ongeldig nummer.")
+        except:
+            print("Er ging iets mis bij het verwijderen.")
+
+def main():
+    while True:
+        print("\n===== SMART APP XL =====")
+        print("1. Weerstation (Smartapp 1)")
+        print("2. Smart Home Controller (Smartapp 2)")
+        print("3. Weer API (Smartapp 3)")
+        print("4. CO2 Calculator")
+        print("5. To-Do App")
+        print("6. Stoppen")
+
+        keuze = input("Maak je keuze: ")
+
+        if keuze == "1":
+            weerstation()
+        elif keuze == "2":
+            smart_app()
+        elif keuze == "3":
+            weer_api()
+        elif keuze == "4":
+            CO2Calculator().run()
+        elif keuze == "5":
+            TodoApp().run()
+        elif keuze == "6":
+            print("Programma afgesloten.")
+            break
+        else:
+            print("Ongeldige keuze.\n")
+
+if __name__ == "__main__":
+    main()
